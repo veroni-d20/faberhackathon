@@ -102,7 +102,7 @@ export default function CreateBrand() {
         generalGuidelines: guidlinesValue,
         pronunciation: pronunciation,
         logo: {
-          logos: { ...inputLogo },
+          logos: [{ ...inputLogo }],
           donts: donts,
           dos: dos,
         },
@@ -269,7 +269,7 @@ export default function CreateBrand() {
                             }}
                           />
                           <input
-                            class="form-control"
+                            className="form-control"
                             type="file"
                             id="formFile"
                             onChange={(e) => {
