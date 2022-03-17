@@ -9,16 +9,18 @@ const client = create("https://ipfs.infura.io:5001/api/v0");
 
 export default function CreateBrand() {
   const history = useHistory();
+
   const [inputLogo, setInputLogo] = useState({
     name: "",
     url: "",
     otherVariation: [],
   });
+
   const [guidlinesValue, setGuidlinesValue] = useState("");
+
   const [colors, setColors] = useState({
     primary: "#ffffff",
     secondary: "#000000",
-    custom: [],
   });
   const [mockupUrl, setMockupUrl] = useState("/aadhar-placeholder.jpg");
 
@@ -57,35 +59,48 @@ export default function CreateBrand() {
   }
 
   const orgNameInputRef = useRef();
-  const orgOverviewInputRef = useRef();
-  const pronounciationInputRef = useRef();
+  const brandOverviewInputRef = useRef();
+  const pronunciationInputRef = useRef();
   const orgDescriptionInputRef = useRef();
 
-  async function createstudent() {
-    var organisationName = orgNameInputRef.current.value;
-    var organisationOverview = orgOverviewInputRef.current.value;
-    var pronounciation = pronounciationInputRef.current.value;
-    var organisationDescription = orgDescriptionInputRef.current.value;
+  async function createBrand() {
+    const organisationName = orgNameInputRef.current.value;
+    const brandOverview = brandOverviewInputRef.current.value;
+    const pronunciation = pronunciationInputRef.current.value;
+    const organisationDescription = orgDescriptionInputRef.current.value;
+    const slugName = organisationName.split(" ").join("-");
 
-    // console.log(ID_ProofUrl);
-    // console.log(marksheetUrl);
-    // console.log(profilePicUrl);
-
-    // const receipt = await blockchain.contract.methods
-    //   .addStudentInfo(
-    //     organisationName,
-    //     organisationOverview,
-    //     pronounciation,
-    //     organisationDescription,
-    //     ID_ProofUrl,
-    //     marksheetUrl,
-    //     profilePicUrl
-    //   )
-    //   .send({
-    //     from: blockchain.account,
-    //   });
-    // console.log(receipt);
-    // history.push("/student");
+    let schema = {
+      [slugName]: {
+        organizationName: organisationName,
+        orgDescription: organisationDescription,
+        brandOverview: brandOverview,
+        generalGuidelines: guidlinesValue,
+        pronunciation: pronunciation,
+        logo: {
+          logos: { ...inputLogo },
+          donts: [
+            "Don't use a logo that is too big or too small",
+            "Don't use a logo that is too big or too small",
+          ],
+          dos: [
+            "The logo should be a square with a minimum height of 100px and a maximum height of 200px.",
+            "The logo should be a square with a minimum height of 100px and a maximum height of 200px.",
+          ],
+        },
+        colors: colors,
+        fonts: {
+          primary: "Roboto",
+          secondary: "Raleway",
+        },
+        mockupImages: [
+          "https://ipfs.io/gateway/5as4d563a41sd4a5sd1a2d1sa321",
+          "https://ipfs.io/gateway/5as4d563a41sd4a5sd1a2d1sa321",
+          "https://ipfs.io/gateway/5as4d563a41sd4a5sd1a2d1sa321",
+        ],
+      },
+    };
+    console.log(schema);
 
     // Call API to create brand
   }
@@ -131,7 +146,7 @@ export default function CreateBrand() {
                 Brand Overview
               </label>
               <input
-                ref={orgOverviewInputRef}
+                ref={brandOverviewInputRef}
                 type="text"
                 className={"p-3 d-flex bg-dark  text-white rounded focus-none"}
                 style={{ width: "100%" }}
@@ -140,26 +155,25 @@ export default function CreateBrand() {
               />
             </div>
             <div className="">
-              <label htmlFor="inputOverview" className="text-dark">
+              <label htmlFor="inputOverview" className="text-dark ">
                 General Guidlines
               </label>
               <MDEditor
                 height={200}
                 value={guidlinesValue}
-                onChange={() => setGuidlinesValue(guidlinesValue)}
+                onChange={setGuidlinesValue}
               />
-              <MDEditor.Markdown source={guidlinesValue} />
             </div>
             <div className="form-group  my-4">
-              <label htmlFor="inputPronounciation" className="text-dark">
-                Pronounciation
+              <label htmlFor="inputPronunciation" className="text-dark">
+                pronunciation
               </label>
               <input
-                ref={pronounciationInputRef}
+                ref={pronunciationInputRef}
                 type="text"
                 className={"p-3 d-flex bg-dark  text-white  rounded focus-none"}
                 style={{ width: "100%" }}
-                id="inputPronounciation"
+                id="inputPronunciation"
                 placeholder="li-cet patt-ar-ee"
               />
             </div>
@@ -196,7 +210,7 @@ export default function CreateBrand() {
                     }}
                   />
                   <input
-                    class="form-control"
+                    className="form-control"
                     type="file"
                     id="formFile"
                     onChange={(e) => {
@@ -297,7 +311,7 @@ export default function CreateBrand() {
                 className="form-control my-3 bg-dark text-white"
                 name="Mockup_Images"
                 placeholder="Upload Mockup Images"
-                onChange={retrieveMockup}
+                // onChange={retrieveMockup}
               />
             </div>
           </form>
@@ -305,7 +319,7 @@ export default function CreateBrand() {
           <hr />
 
           <div
-            // onClick={createstudent}
+            onClick={createBrand}
             className="mt-5 btn d-block btn-lg fw-bold btn-primary p-3"
           >
             Create Brand ✅
