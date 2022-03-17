@@ -1,61 +1,45 @@
 import { useState, useRef } from "react";
-// import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-
+import { useHistory } from "react-router-dom";
+import MDEditor from "@uiw/react-md-editor";
+import { MdOutlineCancel } from "react-icons/md";
+import { CgAdd } from "react-icons/cg";
 import { create } from "ipfs-http-client";
+import { IconButton } from "@mui/material";
 
-const client = create("https://ipfs.infura.io:5001/api/v0");
+// const client = create("https://ipfs.infura.io:5001/api/v0");
 
 export default function CreateBrand() {
-  //   const blockchain = useSelector((state) => state.blockchain);
-  //   console.log(blockchain);
-  // const [ID_ProofFile, setID_ProofFile] = useState(null);
-  // const [marksheetFile, setMarksheetFile] = useState(null);
-  const [ID_ProofUrl, setID_ProofUrl] = useState("/aadhar-placeholder.jpg");
-  const [marksheetUrl, setMarksheetUrl] = useState(
-    "/marksheet-placeholder.jpg"
-  );
-  const [profilePicUrl, setProfilePicUrl] = useState("/avatar.png");
-  // const [urlArr, setUrlArr] = useState([]);
-  let history = useNavigate();
+  const history = useHistory();
+  const [inputLogo, setInputLogo] = useState([{ name: "", url: "" }]);
+  const [guidlinesValue, setGuidlinesValue] = useState("");
+
+  function addInput() {
+    const values = [...inputLogo];
+    console.log(values);
+    values.push({ name: "", url: "" });
+    setInputLogo(values);
+    console.log(inputLogo);
+  }
+  function removeInput(i) {
+    const values = [...inputLogo];
+    values.splice(i, 1);
+    setInputLogo(values);
+  }
+  function handleLogoChange(i, event) {
+    const values = [...inputLogo];
+    values[i].name = event.target.value;
+    setInputLogo(values);
+  }
+  function handleFileChange(i, event) {
+    const values = [...inputLogo];
+    values[i].url = event.target.files[0];
+    setInputLogo(values);
+  }
 
   const orgNameInputRef = useRef();
   const orgOverviewInputRef = useRef();
   const pronounciationInputRef = useRef();
   const orgDescriptionInputRef = useRef();
-
-  async function retrieveMarksheet(e) {
-    const file = e.target.files[0];
-    try {
-      const added = await client.add(file);
-      const url = `https://ipfs.infura.io/ipfs/${added.path}`;
-      setMarksheetUrl(url);
-    } catch (error) {
-      console.log("Error uploading file: ", error);
-    }
-  }
-
-  async function retrieveID_Proof(e) {
-    const file = e.target.files[0];
-    try {
-      const added = await client.add(file);
-      const url = `https://ipfs.infura.io/ipfs/${added.path}`;
-      setID_ProofUrl(url);
-    } catch (error) {
-      console.log("Error uploading file: ", error);
-    }
-  }
-
-  async function retrieveProfilePic(e) {
-    const file = e.target.files[0];
-    try {
-      const added = await client.add(file);
-      const url = `https://ipfs.infura.io/ipfs/${added.path}`;
-      setProfilePicUrl(url);
-    } catch (error) {
-      console.log("Error uploading file: ", error);
-    }
-  }
 
   async function createstudent() {
     var organisationName = orgNameInputRef.current.value;
@@ -63,9 +47,9 @@ export default function CreateBrand() {
     var pronounciation = pronounciationInputRef.current.value;
     var organisationDescription = orgDescriptionInputRef.current.value;
 
-    console.log(ID_ProofUrl);
-    console.log(marksheetUrl);
-    console.log(profilePicUrl);
+    // console.log(ID_ProofUrl);
+    // console.log(marksheetUrl);
+    // console.log(profilePicUrl);
 
     // const receipt = await blockchain.contract.methods
     //   .addStudentInfo(
@@ -81,7 +65,7 @@ export default function CreateBrand() {
     //     from: blockchain.account,
     //   });
     // console.log(receipt);
-    history.push("/student");
+    // history.push("/student");
 
     // Call API to create brand
   }
@@ -135,7 +119,17 @@ export default function CreateBrand() {
                 placeholder="Netflix is a streaming service that offers a wide variety of content, including movies, TV shows, anime, documentaries, and more. It is owned by Netflix, Inc., a Delaware corporation."
               />
             </div>
-
+            <div className="">
+              <label htmlFor="inputOverview" className="text-dark">
+                General Guidlines
+              </label>
+              <MDEditor
+                height={200}
+                value={guidlinesValue}
+                onChange={() => setGuidlinesValue(guidlinesValue)}
+              />
+              <MDEditor.Markdown source={guidlinesValue} />
+            </div>
             <div className="form-group  my-4">
               <label htmlFor="inputPronounciation" className="text-dark">
                 Pronounciation
@@ -149,69 +143,68 @@ export default function CreateBrand() {
                 placeholder="li-cet patt-ar-ee"
               />
             </div>
-
-            <div className="d-flex justify-content-start">
-              <div className="me-md-4">
-                <div>Upload Profile Pic</div>
-                <input
-                  type="file"
-                  className="form-control my-3 bg-dark text-white"
-                  name="profilePic"
-                  placeholder="Upload Profile Pic"
-                  onChange={retrieveProfilePic}
-                />
+            <div className="col-md-12">
+              <label htmlFor="inputLogo" className="form-label fs-5 my-4 ">
+                Logo
+              </label>
+              <div className="d-inline-block">
+                <IconButton
+                  sx={{ color: "#182340" }}
+                  aria-label="add"
+                  component="span"
+                  onClick={addInput}
+                >
+                  <CgAdd sx={{ width: "40px", height: "40px" }} />
+                </IconButton>
               </div>
-              <div className="me-md-4">
-                <div>Upload ID_Proof Card</div>
-                <input
-                  type="file"
-                  className="form-control my-3 bg-dark text-white"
-                  name="ID_Proof"
-                  placeholder="Upload ID_Proof"
-                  onChange={retrieveID_Proof}
-                />
-              </div>
-
-              <div className="me-md-4">
-                <div>Upload Marksheet</div>
-                <input
-                  type="file"
-                  className="form-control my-3 bg-dark text-white"
-                  name="marksheet"
-                  onChange={retrieveMarksheet}
-                />
-              </div>
+              {inputLogo.map((input, index) => (
+                <div key={`${input}-${index}`}>
+                  <div className="d-flex">
+                    {index > 0 && (
+                      <div className="my-md-2">
+                        <IconButton
+                          onClick={() => removeInput(index)}
+                          className=""
+                          sx={{ color: "#ec523e" }}
+                          aria-label="cancel"
+                          component="span"
+                        >
+                          <MdOutlineCancel
+                            sx={{ width: "40px", height: "40px" }}
+                          />
+                        </IconButton>
+                      </div>
+                    )}
+                    <input
+                      type="text"
+                      className="form-control mb-2 p-2 "
+                      placeholder="Logo"
+                      value={input.name ? input.name : ""}
+                      onChange={(e) => {
+                        handleLogoChange(index, e);
+                      }}
+                    />
+                  </div>
+                  <input
+                    className="form-control p-2 mb-3 "
+                    type="file"
+                    id="logoFile"
+                    onChange={(e) => {
+                      handleFileChange(index, e);
+                    }}
+                  />
+                </div>
+              ))}
             </div>
           </form>
 
           <hr />
 
-          <div className="d-flex justify-content-between mt-3">
-            <div>
-              Your uploaded Profile Picture
-              <div className="card card-body my-3 me-md-3">
-                <img src={profilePicUrl} style={{ height: "300px" }} alt="" />
-              </div>
-            </div>
-            <div>
-              Your uploaded ID_Proof image
-              <div className="card card-body my-3 me-md-3">
-                <img src={ID_ProofUrl} style={{ height: "300px" }} alt="" />
-              </div>
-            </div>
-            <div>
-              Your uploaded marksheet image
-              <div className="card card-body my-3 me-md-3">
-                <img src={marksheetUrl} style={{ height: "300px" }} alt="" />
-              </div>
-            </div>
-          </div>
-
           <div
-            onClick={() => createstudent()}
+            // onClick={createstudent}
             className="mt-5 btn d-block btn-lg fw-bold btn-primary p-3"
           >
-            Create Student & Proceed ✅
+            Create Brand ✅
           </div>
         </section>
       </div>
