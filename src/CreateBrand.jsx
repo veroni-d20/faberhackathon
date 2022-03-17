@@ -22,17 +22,37 @@ export default function CreateBrand() {
     primary: "#ffffff",
     secondary: "#000000",
   });
-  const [mockupUrl, setMockupUrl] = useState("/aadhar-placeholder.jpg");
+  const [fonts, setFonts] = useState({ primary: "", secondary: "" });
+  const [mockupUrl, setMockupUrl] = useState([""]);
 
-  async function retrieveMockup(e) {
-    const file = e.target.files[0];
-    try {
-      const added = await client.add(file);
-      const url = `https://ipfs.infura.io/ipfs/${added.path}`;
-      setMockupUrl(url);
-    } catch (error) {
-      console.log("Error uploading file: ", error);
-    }
+  // async function retrieveMockup(e) {
+  //   const file = e.target.files[0];
+  //   try {
+  //     const added = await client.add(file);
+  //     const url = `https://ipfs.infura.io/ipfs/${added.path}`;
+  //     setMockupUrl(url);
+  //   } catch (error) {
+  //     console.log("Error uploading file: ", error);
+  //   }
+  // }
+
+  function retrieveMockup(i, event) {
+    const value = [...mockupUrl];
+    value[i] = event.target.files[0];
+    setMockupUrl(value);
+    console.log(event.target.files[0]);
+  }
+
+  function addMockupInput() {
+    const value = [...mockupUrl];
+    value.push("");
+    setMockupUrl(value);
+  }
+
+  function removeMockupInput(index) {
+    const value = [...mockupUrl];
+    value.splice(index, 1);
+    setMockupUrl(value);
   }
 
   function addInput() {
@@ -62,12 +82,16 @@ export default function CreateBrand() {
   const brandOverviewInputRef = useRef();
   const pronunciationInputRef = useRef();
   const orgDescriptionInputRef = useRef();
+  const dosInputRef = useRef();
+  const dontsInputRef = useRef();
 
   async function createBrand() {
     const organisationName = orgNameInputRef.current.value;
     const brandOverview = brandOverviewInputRef.current.value;
     const pronunciation = pronunciationInputRef.current.value;
     const organisationDescription = orgDescriptionInputRef.current.value;
+    const dos = dosInputRef.current.value;
+    const donts = dontsInputRef.current.value;
     const slugName = organisationName.split(" ").join("-");
 
     let schema = {
@@ -79,25 +103,12 @@ export default function CreateBrand() {
         pronunciation: pronunciation,
         logo: {
           logos: { ...inputLogo },
-          donts: [
-            "Don't use a logo that is too big or too small",
-            "Don't use a logo that is too big or too small",
-          ],
-          dos: [
-            "The logo should be a square with a minimum height of 100px and a maximum height of 200px.",
-            "The logo should be a square with a minimum height of 100px and a maximum height of 200px.",
-          ],
+          donts: donts,
+          dos: dos,
         },
         colors: colors,
-        fonts: {
-          primary: "Roboto",
-          secondary: "Raleway",
-        },
-        mockupImages: [
-          "https://ipfs.io/gateway/5as4d563a41sd4a5sd1a2d1sa321",
-          "https://ipfs.io/gateway/5as4d563a41sd4a5sd1a2d1sa321",
-          "https://ipfs.io/gateway/5as4d563a41sd4a5sd1a2d1sa321",
-        ],
+        fonts: fonts,
+        mockupImages: mockupUrl,
       },
     };
     console.log(schema);
@@ -271,6 +282,30 @@ export default function CreateBrand() {
                   </div>
                 ))}
             </div>
+            <div className="form-group  my-4">
+              <label htmlFor="inputDos" className="text-dark">
+                Do's
+              </label>
+              <textarea
+                ref={dosInputRef}
+                className={"p-3 d-flex bg-dark  text-white  rounded focus-none"}
+                style={{ width: "100%" }}
+                id="inputDos"
+                placeholder="Do's"
+              />
+            </div>
+            <div className="form-group  my-4">
+              <label htmlFor="inputDonts" className="text-dark">
+                Dont's
+              </label>
+              <textarea
+                ref={dontsInputRef}
+                className={"p-3 d-flex bg-dark  text-white  rounded focus-none"}
+                style={{ width: "100%" }}
+                id="inputDonts"
+                placeholder="Dont's"
+              />
+            </div>
             <label htmlFor="inputColor" className="text-dark form-label ">
               Colors
             </label>
@@ -304,15 +339,83 @@ export default function CreateBrand() {
                 ></input>
               </div>
             </div>
-            <div className="me-md-4 my-4">
-              <div>Upload Mockup Images</div>
+            <div className="form-group  my-4">
+              <label htmlFor="inputFonts" className="text-dark">
+                Fonts
+              </label>
               <input
-                type="file"
-                className="form-control my-3 bg-dark text-white"
-                name="Mockup_Images"
-                placeholder="Upload Mockup Images"
-                // onChange={retrieveMockup}
+                type="text"
+                className={"p-3 d-flex bg-dark  text-white  rounded focus-none"}
+                style={{ width: "100%" }}
+                id="inputFonts"
+                placeholder="Roboto"
+                onChange={(e) => {
+                  const values = { ...fonts };
+                  values.primary = e.target.value;
+                  setFonts(values);
+                }}
               />
+            </div>
+            <div className="form-group  my-4">
+              <input
+                type="text"
+                className={"p-3 d-flex bg-dark  text-white  rounded focus-none"}
+                style={{ width: "100%" }}
+                id="inputFonts"
+                placeholder="Sans-serif"
+                onChange={(e) => {
+                  const values = { ...fonts };
+                  values.secondary = e.target.value;
+                  setFonts(values);
+                }}
+              />
+            </div>
+            <div className="me-md-4 my-4">
+              <label
+                htmlFor="inputMockups"
+                className="text-dark form-label my-4 "
+              >
+                Mockups
+              </label>
+              <div className="d-inline-block">
+                <button
+                  className="btn"
+                  type="button"
+                  sx={{ color: "#182340" }}
+                  aria-label="add"
+                  component="span"
+                  onClick={addMockupInput}
+                >
+                  <CgAdd sx={{ width: "40px", height: "40px" }} />
+                </button>
+              </div>
+              {mockupUrl.map((input, index) => (
+                <div className="d-flex align-items-center" key={index}>
+                  {index > 0 && (
+                    <div className="">
+                      <button
+                        onClick={() => removeMockupInput(index)}
+                        className="btn"
+                        type="button"
+                        sx={{ color: "#ec523e" }}
+                        aria-label="cancel"
+                        component="span"
+                      >
+                        <MdOutlineCancel
+                          sx={{ width: "40px", height: "40px" }}
+                        />
+                      </button>
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    className="form-control my-3 bg-dark text-white"
+                    name="Mockup_Images"
+                    placeholder="Upload Mockup Images"
+                    onChange={(e) => retrieveMockup(index, e)}
+                  />
+                </div>
+              ))}
             </div>
           </form>
 
