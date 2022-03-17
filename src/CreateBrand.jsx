@@ -4,35 +4,44 @@ import MDEditor from "@uiw/react-md-editor";
 import { MdOutlineCancel } from "react-icons/md";
 import { CgAdd } from "react-icons/cg";
 import { create } from "ipfs-http-client";
-import { IconButton } from "@mui/material";
+import { IconButton, Button } from "@mui/material";
+import { styled } from "@mui/material/styles";
 
 // const client = create("https://ipfs.infura.io:5001/api/v0");
 
+const Input = styled("input")({
+  display: "none",
+});
+
 export default function CreateBrand() {
   const history = useHistory();
-  const [inputLogo, setInputLogo] = useState([{ name: "", url: "" }]);
+  const [inputLogo, setInputLogo] = useState({
+    name: "",
+    url: "",
+    otherVariation: [],
+  });
   const [guidlinesValue, setGuidlinesValue] = useState("");
 
   function addInput() {
-    const values = [...inputLogo];
+    const values = { ...inputLogo };
     console.log(values);
-    values.push({ name: "", url: "" });
+    values.otherVariation.push({ name: "", url: "" });
     setInputLogo(values);
     console.log(inputLogo);
   }
   function removeInput(i) {
-    const values = [...inputLogo];
-    values.splice(i, 1);
+    const values = { ...inputLogo };
+    values.otherVariation.splice(i, 1);
     setInputLogo(values);
   }
   function handleLogoChange(i, event) {
-    const values = [...inputLogo];
-    values[i].name = event.target.value;
+    const values = { ...inputLogo };
+    values.otherVariation[i].name = event.target.value;
     setInputLogo(values);
   }
   function handleFileChange(i, event) {
-    const values = [...inputLogo];
-    values[i].url = event.target.files[0];
+    const values = { ...inputLogo };
+    values.otherVariation[i].url = event.target.files[0];
     setInputLogo(values);
   }
 
@@ -157,14 +166,52 @@ export default function CreateBrand() {
                   <CgAdd sx={{ width: "40px", height: "40px" }} />
                 </IconButton>
               </div>
-              {inputLogo.map((input, index) => (
-                <div key={`${input}-${index}`}>
-                  <div className="d-flex">
-                    {index > 0 && (
-                      <div className="my-md-2">
+
+              <div className="w-100">
+                <div className="input-group mb-3">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Logo Name"
+                    aria-label="Logo Name"
+                    aria-describedby="button-addon2"
+                    value={inputLogo.name}
+                    onChange={(e) => {
+                      const values = { ...inputLogo };
+                      values.name = e.target.value;
+                      setInputLogo(values);
+                    }}
+                  />
+                  <label htmlFor="contained-button-file">
+                    <Input
+                      accept="image/*"
+                      id="contained-button-file"
+                      multiple
+                      type="file"
+                      onChange={(e) => {
+                        const values = { ...inputLogo };
+                        values.url = e.target.files[0];
+                        setInputLogo(values);
+                      }}
+                    />
+                    <Button variant="contained" component="span">
+                      Upload
+                    </Button>
+                  </label>
+                </div>
+              </div>
+
+              {inputLogo.otherVariation.length > 0 &&
+                inputLogo.otherVariation.map((input, index) => (
+                  <div
+                    key={`${input}-${index}`}
+                    className={`${index > 0 && "mt-2"}`}
+                  >
+                    <div className="d-flex">
+                      <div className="">
                         <IconButton
                           onClick={() => removeInput(index)}
-                          className=""
+                          className="mt-0"
                           sx={{ color: "#ec523e" }}
                           aria-label="cancel"
                           component="span"
@@ -174,28 +221,50 @@ export default function CreateBrand() {
                           />
                         </IconButton>
                       </div>
-                    )}
-                    <input
-                      type="text"
-                      className="form-control mb-2 p-2 "
-                      placeholder="Logo"
-                      value={input.name ? input.name : ""}
-                      onChange={(e) => {
-                        handleLogoChange(index, e);
-                      }}
-                    />
+
+                      <div className="w-100">
+                        <div className="input-group mb-3">
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Logo Name"
+                            aria-label="Logo Name"
+                            aria-describedby="button-addon2"
+                            value={input.name}
+                            onChange={(e) => {
+                              handleLogoChange(index, e);
+                            }}
+                          />
+                          <label htmlFor={`contained-button-file-${index}`}>
+                            <Input
+                              accept="image/*"
+                              id={`contained-button-file-${index}`}
+                              multiple
+                              type="file"
+                              onChange={(e) => {
+                                handleFileChange(index, e);
+                              }}
+                            />
+                            <Button variant="contained" component="span">
+                              Upload
+                            </Button>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <input
-                    className="form-control p-2 mb-3 "
-                    type="file"
-                    id="logoFile"
-                    onChange={(e) => {
-                      handleFileChange(index, e);
-                    }}
-                  />
-                </div>
-              ))}
+                ))}
             </div>
+            <label htmlFor="exampleColorInput" className="form-label">
+              Color picker
+            </label>
+            <input
+              type="color"
+              className="form-control form-control-color"
+              id="exampleColorInput"
+              value="#563d7c"
+              title="Choose your color"
+            ></input>
           </form>
 
           <hr />
