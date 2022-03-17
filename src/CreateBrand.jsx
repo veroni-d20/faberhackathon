@@ -4,14 +4,8 @@ import MDEditor from "@uiw/react-md-editor";
 import { MdOutlineCancel } from "react-icons/md";
 import { CgAdd } from "react-icons/cg";
 import { create } from "ipfs-http-client";
-import { IconButton, Button } from "@mui/material";
-import { styled } from "@mui/material/styles";
 
-// const client = create("https://ipfs.infura.io:5001/api/v0");
-
-const Input = styled("input")({
-  display: "none",
-});
+const client = create("https://ipfs.infura.io:5001/api/v0");
 
 export default function CreateBrand() {
   const history = useHistory();
@@ -21,6 +15,23 @@ export default function CreateBrand() {
     otherVariation: [],
   });
   const [guidlinesValue, setGuidlinesValue] = useState("");
+  const [colors, setColors] = useState({
+    primary: "#ffffff",
+    secondary: "#000000",
+    custom: [],
+  });
+  const [mockupUrl, setMockupUrl] = useState("/aadhar-placeholder.jpg");
+
+  async function retrieveMockup(e) {
+    const file = e.target.files[0];
+    try {
+      const added = await client.add(file);
+      const url = `https://ipfs.infura.io/ipfs/${added.path}`;
+      setMockupUrl(url);
+    } catch (error) {
+      console.log("Error uploading file: ", error);
+    }
+  }
 
   function addInput() {
     const values = { ...inputLogo };
@@ -153,18 +164,20 @@ export default function CreateBrand() {
               />
             </div>
             <div className="col-md-12">
-              <label htmlFor="inputLogo" className="form-label fs-5 my-4 ">
+              <label htmlFor="inputLogo" className="text-dark form-label my-4 ">
                 Logo
               </label>
               <div className="d-inline-block">
-                <IconButton
+                <button
+                  className="btn"
+                  type="button"
                   sx={{ color: "#182340" }}
                   aria-label="add"
                   component="span"
                   onClick={addInput}
                 >
                   <CgAdd sx={{ width: "40px", height: "40px" }} />
-                </IconButton>
+                </button>
               </div>
 
               <div className="w-100">
@@ -182,22 +195,16 @@ export default function CreateBrand() {
                       setInputLogo(values);
                     }}
                   />
-                  <label htmlFor="contained-button-file">
-                    <Input
-                      accept="image/*"
-                      id="contained-button-file"
-                      multiple
-                      type="file"
-                      onChange={(e) => {
-                        const values = { ...inputLogo };
-                        values.url = e.target.files[0];
-                        setInputLogo(values);
-                      }}
-                    />
-                    <Button variant="contained" component="span">
-                      Upload
-                    </Button>
-                  </label>
+                  <input
+                    class="form-control"
+                    type="file"
+                    id="formFile"
+                    onChange={(e) => {
+                      const values = { ...inputLogo };
+                      values.url = e.target.files[0];
+                      setInputLogo(values);
+                    }}
+                  />
                 </div>
               </div>
 
@@ -209,9 +216,10 @@ export default function CreateBrand() {
                   >
                     <div className="d-flex">
                       <div className="">
-                        <IconButton
+                        <button
                           onClick={() => removeInput(index)}
-                          className="mt-0"
+                          className="btn"
+                          type="button"
                           sx={{ color: "#ec523e" }}
                           aria-label="cancel"
                           component="span"
@@ -219,7 +227,7 @@ export default function CreateBrand() {
                           <MdOutlineCancel
                             sx={{ width: "40px", height: "40px" }}
                           />
-                        </IconButton>
+                        </button>
                       </div>
 
                       <div className="w-100">
@@ -235,36 +243,63 @@ export default function CreateBrand() {
                               handleLogoChange(index, e);
                             }}
                           />
-                          <label htmlFor={`contained-button-file-${index}`}>
-                            <Input
-                              accept="image/*"
-                              id={`contained-button-file-${index}`}
-                              multiple
-                              type="file"
-                              onChange={(e) => {
-                                handleFileChange(index, e);
-                              }}
-                            />
-                            <Button variant="contained" component="span">
-                              Upload
-                            </Button>
-                          </label>
+                          <input
+                            class="form-control"
+                            type="file"
+                            id="formFile"
+                            onChange={(e) => {
+                              handleFileChange(index, e);
+                            }}
+                          />
                         </div>
                       </div>
                     </div>
                   </div>
                 ))}
             </div>
-            <label htmlFor="exampleColorInput" className="form-label">
-              Color picker
+            <label htmlFor="inputColor" className="text-dark form-label ">
+              Colors
             </label>
-            <input
-              type="color"
-              className="form-control form-control-color"
-              id="exampleColorInput"
-              value="#563d7c"
-              title="Choose your color"
-            ></input>
+            <div className="d-flex">
+              <div className="mx-2">
+                <input
+                  type="color"
+                  className="form-control form-control-color"
+                  id="exampleColorInput"
+                  value={colors.primary}
+                  title="Choose your color"
+                  onChange={(e) => {
+                    const values = { ...colors };
+                    values.primary = e.target.value;
+                    setColors(values);
+                  }}
+                ></input>
+              </div>
+              <div className="mx-2">
+                <input
+                  type="color"
+                  className="form-control form-control-color"
+                  id="exampleColorInput"
+                  value={colors.secondary}
+                  title="Choose your color"
+                  onChange={(e) => {
+                    const values = { ...colors };
+                    values.secondary = e.target.value;
+                    setColors(values);
+                  }}
+                ></input>
+              </div>
+            </div>
+            <div className="me-md-4 my-4">
+              <div>Upload Mockup Images</div>
+              <input
+                type="file"
+                className="form-control my-3 bg-dark text-white"
+                name="Mockup_Images"
+                placeholder="Upload Mockup Images"
+                onChange={retrieveMockup}
+              />
+            </div>
           </form>
 
           <hr />
